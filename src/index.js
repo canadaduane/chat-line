@@ -20,16 +20,24 @@ let collabText = "";
 
 // Set up the ANSI neat-input command line interface
 const render = () => {
+  // Make it easier to see if the docUri is the same or different across terminals
+  const hue = Buffer.from(docUri).reduce((total, k) => total + k) % 256;
+  const uriColor = ansi.bgColor.ansi256.hsl(hue, 80, 70);
+  const begin = `${uriColor}${ansi.color.black.open}`;
+  const end = `${ansi.color.close}${ansi.bgColor.close}`;
+
   differ.write(`
-  ---------------------------------------------------------------
-   It's a mini collaborative text editor!
-  ---------------------------------------------------------------
-  ${input.line()}
-  ---------------------------------------------------------------
-   URI: ${docUri}
-   (paste this into the other editor)
-  ---------------------------------------------------------------
-  `);
+---------------------------------------------------------------
+ It's a mini collaborative text editor!
+---------------------------------------------------------------
+
+${input.line()}
+ 
+---------------------------------------------------------------
+ URI: ${begin}${docUri}${end}
+ (paste this into the other editor)
+---------------------------------------------------------------
+`);
 };
 
 const openUri = _docUri => {
