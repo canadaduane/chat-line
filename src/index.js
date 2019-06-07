@@ -1,40 +1,74 @@
-import Path from "path";
-import Debug from "debug";
 import { Repo } from "hypermerge";
-import storage from "random-access-file";
-const discoverySwarm = require("discovery-swarm");
-const swarmDefaults = require("dat-swarm-defaults");
-// import DiscoverySwarm from "discovery-cloud-client";
-// const discoveryUrl = "wss://discovery-cloud.herokuapp.com";
+import storage from "random-access-memory";
+import DiscoverySwarm from "discovery-cloud-client";
 
-const log = Debug("chat");
+import NeatInput from "neat-input";
+import DiffStream from "ansi-diff-stream";
+import ansi from "ansi-styles";
 
-const docUri = "hypermerge:/8NNovZ6CsgQh3HUbSBT56q3Eu3ov9SMptC4jyVeDR1qy"; // chat thread
-log("docUri", docUri);
+const discoveryUrl = "wss://discovery-cloud.herokuapp.com";
 
-const path =
-  process.env["DATADIR"] || Path.join(process.env["HOME"], ".hypermerge-chat");
-log("hypermerge storage path", path);
+const repo = new Repo({ storage, port: 0 });
+const input = NeatInput({
+  style: (start, cursor, end) =>
+    start + ansi.inverse.open + (cursor || " ") + ansi.inverse.close + end
+});
+const differ = DiffStream();
 
-process.on("SIGINT", function() {
-  console.log("SIGINT", process.pid);
-  process.exit();
+let docUri;
+let collabText = "";
+
+// Set up the ANSI neat-input command line interface
+const render = () => {
+  differ.write(`
+  ---------------------------------------------------------------
+   It's a mini collaborative text editor!
+  ---------------------------------------------------------------
+  ${input.line()}
+  ---------------------------------------------------------------
+   URI: ${docUri}
+   (paste this into the other editor)
+  ---------------------------------------------------------------
+  `);
+};
+
+const openUri = _docUri => {
+  docUri = _docUri;
+  // repo.open(docUri);
+  repo.watch(docUri, newState => {
+    const oldCursor = input.cursor;
+    input.set(newState.text);
+    input.cursor = oldCursor;
+    render();
+  });
+};
+
+differ.pipe(process.stdout);
+
+input.on("update", () => {
+  const newText = input.rawLine();
+  const match = newText.match(/^hypermerge:\/([0-9A-Za-z]{44,44})$/);
+  if (match) {
+    openUri(newText);
+    input.set("");
+  } else {
+    repo.change(docUri, doc => {
+      doc.text = newText;
+    });
+  }
+  // const pos = input.cursor;
+  render();
 });
 
-const repo = new Repo({ storage, path, port: 0 });
-// const swarm = new DiscoverySwarm({
-//   url: discoveryUrl,
-//   id: repo.back.id,
-//   stream: repo.back.stream
-// });
-const swarm = discoverySwarm(
-  swarmDefaults({
-    port: 0,
-    hash: false,
-    encrypt: true,
-    stream: repo.stream,
-    id: repo.id
-  })
-);
+// Set up the Hypermerge documents
+const swarm = new DiscoverySwarm({
+  url: discoveryUrl,
+  id: repo.back.id,
+  stream: repo.back.stream
+});
+
 repo.replicate(swarm);
-repo.watch(docUri, msg => log("msg", msg));
+openUri(repo.create({ text: "" }));
+
+// Kick off first render
+render();
