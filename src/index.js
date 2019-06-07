@@ -1,4 +1,5 @@
 import { Repo } from "hypermerge";
+import Automerge from "automerge";
 import storage from "random-access-memory";
 import DiscoverySwarm from "discovery-cloud-client";
 
@@ -16,7 +17,7 @@ const input = NeatInput({
 const differ = DiffStream();
 
 let docUri;
-let collabText = "";
+let document = {};
 
 // Set up the ANSI neat-input command line interface
 const render = () => {
@@ -37,6 +38,9 @@ ${input.line()}
  URI: ${begin}${docUri}${end}
  (paste this into the other editor)
 ---------------------------------------------------------------
+
+Document State:
+${JSON.stringify(document, null, 2)}
 `);
 };
 
@@ -45,7 +49,14 @@ const openUri = _docUri => {
   // repo.open(docUri);
   repo.watch(docUri, newState => {
     const oldCursor = input.cursor;
-    input.set(newState.text);
+    document = newState;
+    console.log(
+      "newState",
+      newState.text,
+      newState.text instanceof Automerge.Text,
+      newState.text.constructor.name
+    );
+    input.set(newState.text.join(""));
     input.cursor = oldCursor;
     render();
   });
@@ -53,18 +64,20 @@ const openUri = _docUri => {
 
 differ.pipe(process.stdout);
 
+input.on("insertChar", (cursor, ch) => {
+  repo.change(docUri, doc => {
+    doc.text.insertAt(cursor, ch);
+  });
+});
+
 input.on("update", () => {
   const newText = input.rawLine();
+  console.log("newText", newText);
   const match = newText.match(/^hypermerge:\/([0-9A-Za-z]{44,44})$/);
   if (match) {
     openUri(newText);
     input.set("");
-  } else {
-    repo.change(docUri, doc => {
-      doc.text = newText;
-    });
   }
-  // const pos = input.cursor;
   render();
 });
 
@@ -76,7 +89,7 @@ const swarm = new DiscoverySwarm({
 });
 
 repo.replicate(swarm);
-openUri(repo.create({ text: "" }));
+openUri(repo.create({ text: new Automerge.Text() }));
 
 // Kick off first render
 render();
