@@ -19,7 +19,7 @@ yarn start
 
 ## What is Hypermerge?
 
-[Hypermerge]() is the networking layer between a text editor ([neat-input](https://github.com/mafintosh/neat-input) in this case) and [Automerge](https://github.com/automerge/automerge)]. It makes it easy to use [CRDTs](https://arxiv.org/abs/1608.03960) in an application.
+[Hypermerge]() is the networking layer between a user's local changes (like [neat-input](https://github.com/mafintosh/neat-input) in this case) and [Automerge](https://github.com/automerge/automerge). It makes it easy to use [CRDTs](https://arxiv.org/abs/1608.03960) in an application, so that collaborative operations are guaranteed to converge on a single state shared among viewers.
 
 ## Thanks
 
