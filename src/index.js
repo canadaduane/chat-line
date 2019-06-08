@@ -2,7 +2,6 @@ import { Repo } from "hypermerge";
 import Automerge from "automerge";
 import storage from "random-access-memory";
 import DiscoverySwarm from "discovery-cloud-client";
-import Debug from "debug";
 import uuid from "uuid";
 
 import NeatInput from "neat-input";
@@ -10,7 +9,6 @@ import DiffStream from "ansi-diff-stream";
 import ansi from "ansi-styles";
 
 const me = uuid();
-const log = Debug("chat");
 const discoveryUrl = "wss://discovery-cloud.herokuapp.com";
 
 const repo = new Repo({ storage, port: 0 });
@@ -27,7 +25,7 @@ let stateCount = 0;
 
 // Set up the ANSI neat-input command line interface
 const render = () => {
-  // Make it easier to see if the docUri is the same or different across terminals
+  // Make it easy to see if the URI is same / different between terminals
   const hue = Buffer.from(docUri).reduce((total, k) => total + k) % 256;
   const uriColor = ansi.bgColor.ansi256.hsl(hue, 80, 70);
   const begin = `${uriColor}${ansi.color.black.open}`;
@@ -35,14 +33,14 @@ const render = () => {
 
   differ.write(`
 ---------------------------------------------------------------
- It's a mini collaborative text editor!
+ It's a mini collaborative text chat!
 ---------------------------------------------------------------
 
 ${input.line()}
  
 ---------------------------------------------------------------
  URI: ${begin}${docUri}${end}
- (paste this into the other editor)
+ (paste or type this into the other chat-line)
 ---------------------------------------------------------------
 
 Cursor: ${input.cursor}  Transitions: ${stateCount}
