@@ -2,11 +2,15 @@ import { Repo } from "hypermerge";
 import Automerge from "automerge";
 import storage from "random-access-memory";
 import DiscoverySwarm from "discovery-cloud-client";
+import Debug from "debug";
+import uuid from "uuid";
 
 import NeatInput from "neat-input";
 import DiffStream from "ansi-diff-stream";
 import ansi from "ansi-styles";
 
+const me = uuid();
+const log = Debug("chat");
 const discoveryUrl = "wss://discovery-cloud.herokuapp.com";
 
 const repo = new Repo({ storage, port: 0 });
@@ -16,8 +20,10 @@ const input = NeatInput({
 });
 const differ = DiffStream();
 
+let handle;
 let docUri;
 let document = {};
+let stateCount = 0;
 
 // Set up the ANSI neat-input command line interface
 const render = () => {
@@ -39,46 +45,64 @@ ${input.line()}
  (paste this into the other editor)
 ---------------------------------------------------------------
 
-Document State:
+Cursor: ${input.cursor}  Transitions: ${stateCount}
+My UUID: ${me}
+
+Shared State:
 ${JSON.stringify(document, null, 2)}
 `);
 };
 
 const openUri = _docUri => {
+  if (handle) handle.close();
+  handle = repo.open(_docUri);
   docUri = _docUri;
-  // repo.open(docUri);
-  repo.watch(docUri, newState => {
-    const oldCursor = input.cursor;
-    document = newState;
-    console.log(
-      "newState",
-      newState.text,
-      newState.text instanceof Automerge.Text,
-      newState.text.constructor.name
-    );
-    input.set(newState.text.join(""));
-    input.cursor = oldCursor;
+  handle.subscribe(newDoc => {
+    document = newDoc;
+    input.setRaw(document.text.join(""));
+    stateCount++;
     render();
+  });
+  handle.change(doc => {
+    doc.collaborators[me] = true;
   });
 };
 
 differ.pipe(process.stdout);
 
-input.on("insertChar", (cursor, ch) => {
-  repo.change(docUri, doc => {
+input.on("insertChar", (ch, cursor) => {
+  // console.log("insertChar", cursor, input.cursor, ch.length);
+  handle.change(doc => {
     doc.text.insertAt(cursor, ch);
   });
 });
 
+input.on("backspace", (ch, origCursor, newCursor) => {
+  const removedLength = origCursor - newCursor;
+  handle.change(doc => {
+    // log("removedLength", removedLength, origCursor, newCursor);
+    if (removedLength > 0) {
+      doc.text.splice(newCursor, removedLength);
+    }
+  });
+});
+
+input.on("enter", line => {
+  handle.change(doc => {
+    doc.text.splice(0, doc.text.length);
+  });
+});
+
+input.on("left", render);
+input.on("right", render);
+
 input.on("update", () => {
   const newText = input.rawLine();
-  console.log("newText", newText);
   const match = newText.match(/^hypermerge:\/([0-9A-Za-z]{44,44})$/);
   if (match) {
     openUri(newText);
     input.set("");
   }
-  render();
 });
 
 // Set up the Hypermerge documents
@@ -89,7 +113,8 @@ const swarm = new DiscoverySwarm({
 });
 
 repo.replicate(swarm);
-openUri(repo.create({ text: new Automerge.Text() }));
+const text = new Automerge.Text();
+openUri(repo.create({ text, collaborators: {} }));
 
 // Kick off first render
 render();
