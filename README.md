@@ -4,6 +4,10 @@ A collaborative chat experience on the command-line.
 
 ![Screenshot of chat-line](./screenshot1.png)
 
+Once both terminals have synced on the same Hypermerge URI, collaborative chat ensues:
+
+![Screenshot of chat-line](./screenshot2.png)
+
 ## How to Run
 
 Download & run:
