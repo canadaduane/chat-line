@@ -828,6 +828,16 @@ atomic-batcher@^1.0.2:
   resolved "https://registry.yarnpkg.com/atomic-batcher/-/atomic-batcher-1.0.2.tgz#d16901d10ccec59516c197b9ccd8930689b813b4"
   integrity sha1-0WkB0QzOxZUWwZe5zNiTBom4E7Q=
 
+automerge@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/automerge/-/automerge-0.10.1.tgz#a0a66b9aafc7597c7e98b29625b257f9a8fe4562"
+  integrity sha512-X7k6tlpmm/EbOlz84aLRXb8E8DiKI+gF6mNIVb1wqU9zun45v/tG01JuWNBhP6EDTJaGW1lcN2AQzvApm0ABWQ==
+  dependencies:
+    immutable "^3.8.2"
+    transit-immutable-js "^0.7.0"
+    transit-js "^0.8.861"
+    uuid "3.1.0"
+
 "automerge@github:automerge/automerge#text-hack":
   version "0.10.3"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/5674263647ebd1e736862fd029060548c7fbaa0b"
@@ -2518,9 +2528,9 @@ path-key@^2.0.1:
   integrity sha1-QRyttXTFoUDTpLGRDUDYDMn0C0A=
 
 path-parse@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.6.tgz#d62dbb5679405d72c4737ec58600e9ddcf06d24c"
-  integrity sha512-GSmOT2EbHrINBf9SR7CDELwlJ8AENk3Qn7OikK4nFYAu3Ote2+JYNVvkpAEQm3/TLNEJFD/xZJjzyxg3KBWOzw==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
+  integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
 posix-character-classes@^0.1.0:
   version "0.1.1"
