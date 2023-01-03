@@ -828,6 +828,16 @@ atomic-batcher@^1.0.2:
   resolved "https://registry.yarnpkg.com/atomic-batcher/-/atomic-batcher-1.0.2.tgz#d16901d10ccec59516c197b9ccd8930689b813b4"
   integrity sha1-0WkB0QzOxZUWwZe5zNiTBom4E7Q=
 
+automerge@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/automerge/-/automerge-0.10.1.tgz#a0a66b9aafc7597c7e98b29625b257f9a8fe4562"
+  integrity sha512-X7k6tlpmm/EbOlz84aLRXb8E8DiKI+gF6mNIVb1wqU9zun45v/tG01JuWNBhP6EDTJaGW1lcN2AQzvApm0ABWQ==
+  dependencies:
+    immutable "^3.8.2"
+    transit-immutable-js "^0.7.0"
+    transit-js "^0.8.861"
+    uuid "3.1.0"
+
 "automerge@github:automerge/automerge#text-hack":
   version "0.10.3"
   resolved "https://codeload.github.com/automerge/automerge/tar.gz/5674263647ebd1e736862fd029060548c7fbaa0b"
@@ -2061,11 +2071,9 @@ json-stable-stringify-without-jsonify@^1.0.1:
   integrity sha1-nbe1lJatPzz+8wp1FC0tkwrXJlE=
 
 json5@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-2.1.0.tgz#e7a0c62c48285c628d20a10b85c89bb807c32850"
-  integrity sha512-8Mh9h6xViijj36g7Dxi+Y4S6hNGV96vcJZr/SrlHh1LR/pEn/8j/+qIBbs44YKl69Lrfctp4QD+AdWLTMqEZAQ==
-  dependencies:
-    minimist "^1.2.0"
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
+  integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
 keypress@^0.2.1:
   version "0.2.1"
